@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>图片懒加载</title>
+</head>
+<body id="body">
+  <script>
+    const createImgProxy = (img, loadingImg, realImg) => {
+      let hasLoaded = false;
+      const virtualImg = new Image();
+      virtualImg.src = realImg;
+      virtualImg.onload = () => {
+        Reflect.set(img, 'src', realImg);
+        hasLoaded = true;
+      }
+      return new Proxy(img, {
+        get(obj, prop) {
+          console.log(obj,loadingImg,prop);
+          if (prop === 'src' && !hasLoaded) {
+            return loadingImg;
+          }
+          return obj[prop];
+        }
+      });
+    };
+    const img = new Image();
+    const imgProxy = createImgProxy(img, '/pic.timg.gif', '/pic/pic.jpg');
+    //document.getElementById('body').appendChild(imgProxy);
+  </script>
+</body>
+</html>
